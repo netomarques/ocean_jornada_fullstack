@@ -1,7 +1,9 @@
 const express = require("express");
-const { MongoClient } = require("mongodb");
+const { MongoClient, ObjectId } = require("mongodb");
 
-const DB_URL = "mongodb://127.0.0.1:27017";
+//localhost ou 127.0.0.1
+//const DB_URL = "mongodb://127.0.0.1:27017";
+const DB_URL = "mongodb+srv://admin:fee3gpEjh4jPFPK0@cluster0.0ld9lce.mongodb.net/";
 const DB_NAME = "ocean-bancodados";
 
 async function main() {
@@ -30,7 +32,7 @@ async function main() {
 
   // Lista de informações
   const itens = ["Gabigol", "Pedro", "Bruno Henrique"];
-  //              0        1      2
+  //              0         1          2
 
   // CRUD -> Lista de informações
 
@@ -41,18 +43,40 @@ async function main() {
   });
 
   // Endpoint Read Single by ID -> [GET] /item/:id
-  app.get("/item/:id", function (req, res) {
+  app.get("/item/:id", async function (req, res) {
     const id = req.params.id;
-    const item = itens[id - 1];
+    const item = await collection.findOne({ _id: new ObjectId(id) });
     res.send(item);
   });
 
   // Endpoint Create -> [POST] /item
-  app.post("/item", function (req, res) {
+  app.post("/item", async function (req, res) {
     const item = req.body;
-    itens.push(item.nome);
-    res.send("Item criado com sucesso");
+    await collection.insertOne(item)
+    //itens.push(item.nome);
+    res.send(item);
   });
+
+  // Endpoint Update -> [PUT] /item/:id
+  app.put("/item/:id", async function (req, res) {
+    const id = req.params.id;
+    const body = req.body;
+
+    //console.log(id, body);
+
+    await collection.updateOne(
+      { _id: new ObjectId(id) },
+      { $set: body }
+    );
+
+    res.send(body)
+  });
+
+  // Endpoint Delete -> [DELETE] /item/:id
+  // Exercício:
+  // - pesquisar sobre a operação de remover itens
+  // - implementar o endpoint de delete
+  // - realizar a operação de excluir item
 
   app.listen(3000);
 }
