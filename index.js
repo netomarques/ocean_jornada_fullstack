@@ -73,10 +73,13 @@ async function main() {
   });
 
   // Endpoint Delete -> [DELETE] /item/:id
-  // Exercício:
-  // - pesquisar sobre a operação de remover itens
-  // - implementar o endpoint de delete
-  // - realizar a operação de excluir item
+  app.delete("/item/:id", async function (req, res) {
+    const id = req.params.id;
+
+    await collection.deleteOne({ _id: new ObjectId(id) });
+
+    res.send("Registro removido com sucesso!");
+  });
 
   app.listen(3000);
 }
